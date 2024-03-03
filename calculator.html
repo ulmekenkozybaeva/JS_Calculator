@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./calculator.css">
+</head>
+
+<body>
+    <div class="calculator">
+        <div class="results">
+            <div id="result"></div>
+            <div id="expression"></div>
+        </div>
+        <div class="numbers">            
+            <button class="number" id="1">1</button>
+            <button class="number" id="2">2</button>
+            <button class="number" id="3">3</button>
+
+            <button class="number" id="4">4</button>
+            <button class="number" id="5">5</button>
+            <button class="number" id="6">6</button>
+
+            <button class="number" id="7">7</button>
+            <button class="number" id="8">8</button>
+            <button class="number" id="9">9</button>
+
+            <button class="number" id=".">.</button>
+            <button class="number" id="0">0</button>
+            <button class="equals" id="=">=</button>
+        </div>
+        <div class="operations">
+            <button class="operation" id="*">×</button>
+            <button class="operation" id="/">÷</button>
+            <button class="operation" id="+">+</button>
+            <button class="operation" id="-">-</button>
+        </div>
+        <div class="clears">
+            <button id="clear">AC</button>
+            <button id="ce">CE</button>
+        </div>
+    </div>
+    <script>
+        const result = document.querySelector('#result');
+        const expression = document.querySelector('#expression');
+        const num = document.querySelectorAll('.number:not(.equals)');
+        const operation = document.querySelectorAll('.operation');
+        const equals = document.querySelector('.equals');
+        const clear = document.querySelector('#clear');
+        const ce = document.querySelector('#ce');
+
+        let ex = '';
+        result.innerHTML = '0';
+
+        function clickN() {
+            if (!ex || typeof (ex) === 'number' || ex === '0') {
+                expression.innerHTML = this.id;
+                ex = this.id;
+            } else {
+                expression.innerHTML += this.id;
+                ex += this.id;
+            }
+            result.innerHTML = ex.split(/\/|\*|\+|-|=/).pop();
+            checkLength(result.innerHTML);
+        };
+
+        function clickO() {
+            if (!ex) {
+                return;
+            }
+            ex = ex.toString().replace(/=/, '');
+            if (ex.match(/\/|\*|\+|-|=/)) {
+                ex = eval(ex).toString();
+            }
+            expression.innerHTML = expression.innerHTML.replace(/=/, '') + this.id;
+            ex += this.id;
+            result.innerHTML = this.id;
+        };
+
+        Array.from(num).forEach(function (element) {
+            element.addEventListener('click', clickN);
+        });
+
+        Array.from(operation).forEach(function (element) {
+            element.addEventListener('click', clickO);
+        });
+
+        clear.addEventListener('click', () => {
+            result.innerHTML = '';
+            expression.innerHTML = '';
+            ex = '';
+        })
+
+        ce.addEventListener('click', () => {
+            if (!expression.innerHTML.match(/=$/)) {
+
+                expression.innerHTML = doCE(expression.innerHTML);
+                ex = doCE(ex);
+                result.innerHTML = 0;
+
+                function doCE(arg) {
+                    arg = arg.split(/([\/\*\+\-\=])/g);
+                    arg.splice(-1, 1);
+                    return arg.join('');
+                }
+            }
+        })
+
+        equals.addEventListener('click', () => {
+            if (!ex) {
+                result.innerHTML = '0';
+            } else {
+                ex = eval(ex);
+                expression.innerHTML += '=';
+                result.innerHTML = trim12(ex);
+            }
+        })
+
+        function checkLength(arg) {
+            if (arg.toString().length > 14) {
+                expression.innerHTML = 'number too long'.toUpperCase();
+                result.innerHTML = '0';
+                ex = '0';
+            }
+        }
+
+        function trim12(arg) {
+            if (arg.toString().length > 14) {
+                ex = parseFloat(arg.toPrecision(12));
+                if (ex.toString().length > 14) {
+                    ex = ex.toExponential(9);
+                };
+                return ex;
+            } else {
+                return arg;
+            }
+        }
+    </script>
+</body>
+
+</html>
